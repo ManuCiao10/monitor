@@ -5,9 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 func main() {
+	start := time.Now()
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
 	if err != nil {
@@ -39,4 +41,6 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s\n", bodyText)
+	log.Println("Request took:", time.Since(start))
+	log.Println("Response Status:", resp.Status)
 }
