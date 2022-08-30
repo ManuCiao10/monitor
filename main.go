@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"time"
 
 	http "github.com/saucesteals/fhttp"
