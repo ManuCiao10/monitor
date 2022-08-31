@@ -11,12 +11,15 @@ import (
 )
 
 
+// var Sessions = make(map[string]models.Session)
 var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
 
 
-func main() {
+func request() {
 	start := time.Now()
+	// var client *http.Client
+	// var req *http.Request
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
 	if err != nil {
@@ -48,5 +51,11 @@ func main() {
 	}
 	fmt.Printf("%s\n", bodyText)
 	log.Println("Request took:", time.Since(start))
-	log.Println("Response Status:", resp.Status)
+	log.Println("Status_code:", resp.StatusCode)
+	
+}
+
+func main() {
+	request()
+
 }
