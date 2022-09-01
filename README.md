@@ -5,3 +5,5 @@
 3. TLS/SSL protocol
 4. check the cookies assigned to the user
 5. hawk api
+6. bypass RapidSSL
+7. bypass Cloudflare
