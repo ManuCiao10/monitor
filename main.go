@@ -55,6 +55,10 @@ func request() {
 		Type:  "CERTIFICATE",
 		Bytes: cert,
 	})
+	if certPem == nil {
+		log.Fatal("Certificate cannot be created.")
+	}
+	fmt.Println(string(certPem))
 	
 	tlsCert, err := tls.X509KeyPair(certPem, keyPem)
 	if err != nil {
