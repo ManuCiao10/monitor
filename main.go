@@ -4,7 +4,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
-	"net/http"
 
 	// "io/ioutil"
 	"crypto/rand"
@@ -14,6 +13,8 @@ import (
 	"crypto/x509/pkix"
 	"log"
 	"time"
+
+	"golang.org/x/vuln/client"
 	// http "github.com/saucesteals/fhttp"
 	// "github.com/saucesteals/mimic"
 )
@@ -60,23 +61,37 @@ func request() {
 		log.Fatal("Certificate cannot be created.")
 	}
 	fmt.Println(string(certPem))
-	cert, error := tls.X509KeyPair(c_string, k_string)
-	if err != nil {
-		log.Fatal("Certificate cannot be created.", err.Error())
-	}
-
+	
+	println()
+	cert, _ := tls.X509KeyPair(certPem, keyPem)
 
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
 				Certificates: []tls.Certificate{cert},
 			},
 		},
 	}
+	resp, err := client.Get("https://www.google.com")
+	if err != nil {
+		log.Fatal("Request cannot be sent.", err.Error())
+	}
+	defer resp.Body.Close()
+	fmt.Println(resp.Status)
+	
+
 	
 	log.Printf("Time taken: %s", time.Since(start))
-	// log.Fatal(s.ListenAndServeTLS("", ""))
+	
+	
+}
+
+func main() {
+	request()
+
+}
+
+// log.Fatal(s.ListenAndServeTLS("", ""))
 	// client := &http.Client{}
 	// req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
 	// if err != nil {
@@ -109,17 +124,3 @@ func request() {
 	// fmt.Printf("%s\n", bodyText)
 	// log.Println("Request took:", time.Since(start))
 	// log.Println("Status_code:", resp.StatusCode)
-	
-}
-
-// func proxies() {
-// 	proxies := mimic.GetProxies(mimic.PlatformWindows)
-// 	for _, proxy := range proxies {
-// 		fmt.Println(proxy)
-// 	}
-// }
-
-func main() {
-	request()
-
-}
