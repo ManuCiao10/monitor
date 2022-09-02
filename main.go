@@ -4,6 +4,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+	"net/http"
 
 	// "io/ioutil"
 	"crypto/rand"
@@ -59,25 +60,22 @@ func request() {
 		log.Fatal("Certificate cannot be created.")
 	}
 	fmt.Println(string(certPem))
-	
-	tlsCert, err := tls.X509KeyPair(certPem, keyPem)
+	cert, error := tls.X509KeyPair(c_string, k_string)
 	if err != nil {
-    log.Fatal("Cannot be loaded the certificate.", err.Error())
+		log.Fatal("Certificate cannot be created.", err.Error())
 	}
-	l, err := tls.Listen("tcp", ":8080", &tls.Config{
-		Certificates: []tls.Certificate{tlsCert},
-	})
+
+
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: caCertPool,
+				Certificates: []tls.Certificate{cert},
+			},
+		},
+	}
 	
-
-
-	println(l);
-	
-	fmt.Println(time.Since(start))
-
-
-	
-
-
+	log.Printf("Time taken: %s", time.Since(start))
 	// log.Fatal(s.ListenAndServeTLS("", ""))
 	// client := &http.Client{}
 	// req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
