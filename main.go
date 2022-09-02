@@ -4,6 +4,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
+	"net/http"
 
 	// "io/ioutil"
 	"crypto/rand"
@@ -14,7 +15,6 @@ import (
 	"log"
 	"time"
 
-	"golang.org/x/vuln/client"
 	// http "github.com/saucesteals/fhttp"
 	// "github.com/saucesteals/mimic"
 )
@@ -63,16 +63,16 @@ func request() {
 	fmt.Println(string(certPem))
 	
 	println()
-	cert, _ := tls.X509KeyPair(certPem, keyPem)
+	certicate, _ := tls.X509KeyPair(certPem, keyPem)
 
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				Certificates: []tls.Certificate{cert},
+				Certificates: []tls.Certificate{certicate},
 			},
 		},
 	}
-	resp, err := client.Get("https://www.google.com")
+	resp, err := client.Get("https://www.aw-lab.com/")
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
