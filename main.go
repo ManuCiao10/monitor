@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/pem"
 	"fmt"
+	// "io/ioutil"
 	"math/big"
 	"net/http"
 
@@ -14,7 +15,6 @@ import (
 	"crypto/x509/pkix"
 	"log"
 	"time"
-
 	// http "github.com/saucesteals/fhttp"
 	// "github.com/saucesteals/mimic"
 )
@@ -60,11 +60,13 @@ func request() {
 	if certPem == nil {
 		log.Fatal("Certificate cannot be created.")
 	}
-	fmt.Println(string(certPem))
+	// Create a tls certificate from the pem blocks
+	certicate, error_cert := tls.X509KeyPair(certPem, keyPem)
+	if error_cert != nil {
+		log.Fatal("Certificate cannot be created.", error_cert.Error())
+	}
+	// Create a tls.Config with the certificate
 	
-	println()
-	certicate, _ := tls.X509KeyPair(certPem, keyPem)
-
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -72,15 +74,32 @@ func request() {
 			},
 		},
 	}
-	resp, err := client.Get("https://www.aw-lab.com/")
+	// Create a request
+	req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
-	defer resp.Body.Close()
-	fmt.Println(resp.Status)
+	req.Header.Set("authority", "en.aw-lab.com")
+	req.Header.Set("accept", "application/json, text/javascript, */*; q=0.01")
+	req.Header.Set("accept-language", "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6,fr;q=0.5")
+	req.Header.Set("cache-control", "no-cache")
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("pragma", "no-cache")
+	req.Header.Set("sec-ch-ua", `"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"`)
+	req.Header.Set("sec-ch-ua-mobile", "?0")
+	req.Header.Set("sec-ch-ua-platform", `"macOS"`)
+	req.Header.Set("sec-fetch-dest", "empty")
+	req.Header.Set("sec-fetch-mode", "cors")
+	req.Header.Set("sec-fetch-site", "same-origin")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
+	req.Header.Set("x-requested-with", "XMLHttpRequest")
 	
-
-	
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Request",req)
+	fmt.Println("Response status:", resp.Status)
 	log.Printf("Time taken: %s", time.Since(start))
 	
 	
@@ -90,37 +109,3 @@ func main() {
 	request()
 
 }
-
-// log.Fatal(s.ListenAndServeTLS("", ""))
-	// client := &http.Client{}
-	// req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// req.Header.Set("authority", "en.aw-lab.com")
-	// req.Header.Set("accept", "application/json, text/javascript, */*; q=0.01")
-	// req.Header.Set("accept-language", "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6,fr;q=0.5")
-	// req.Header.Set("cache-control", "no-cache")
-	// req.Header.Set("content-type", "application/json")
-	// req.Header.Set("pragma", "no-cache")
-	// req.Header.Set("referer", "https://en.aw-lab.com/men/shoes-AW_106COOCOOA.html?dwvar_AW__106COOCOOA_color=8012225")
-	// req.Header.Set("sec-ch-ua", `"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"`)
-	// req.Header.Set("sec-ch-ua-mobile", "?0")
-	// req.Header.Set("sec-ch-ua-platform", `"macOS"`)
-	// req.Header.Set("sec-fetch-dest", "empty")
-	// req.Header.Set("sec-fetch-mode", "cors")
-	// req.Header.Set("sec-fetch-site", "same-origin")
-	// req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
-	// req.Header.Set("x-requested-with", "XMLHttpRequest")
-	// resp, err := client.Do(req)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer resp.Body.Close()
-	// bodyText, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%s\n", bodyText)
-	// log.Println("Request took:", time.Since(start))
-	// log.Println("Status_code:", resp.StatusCode)
