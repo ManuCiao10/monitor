@@ -3,10 +3,7 @@ package main
 import (
 	"encoding/pem"
 	"fmt"
-
-	// "io/ioutil"
-	"math/big"
-	"net/http"
+	"os"
 
 	// "io/ioutil"
 	"crypto/rand"
@@ -15,25 +12,28 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"log"
+	"math/big"
+	"net/http"
+	"net/http/cookiejar"
+	"net/url"
 	"time"
-	"constant"
-	// "github.com/chromedp/cdproto/network"
-	// "github.com/chromedp/chromedp"
-	// "gitlab-com/gl-security/threatmanagement/redteam/redteam-public/cfClearance/browser"
-
-	// "github.com/corpix/uarand"
-	// http "github.com/saucesteals/fhttp"
-	// "github.com/saucesteals/mimic"
 )
 
 // var Sessions = make(map[string]models.Session)
 // var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 // var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
 
+const (
+	// The number of bits to use in the generated private key.
+	AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+	URL = "https://www.aw-lab.com/on/demandware.store/Sites-awlab-it-Site/it_IT/Product-GetAvailability?format=ajax&pid=AW_22121RBA_8041591"
+)
+
 
 func request() {
 	start := time.Now()
-	key, err := rsa.GenerateKey(rand.Reader, constant.keyBits)
+	
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		log.Fatal("Private key cannot be created.", err.Error())
 	}
@@ -55,6 +55,7 @@ func request() {
 		},
 		BasicConstraintsValid: true,
 	}
+	// Generate a certificate
 	cert, err := x509.CreateCertificate(rand.Reader, &tml, &tml, &key.PublicKey, key)
 	if err != nil {
 		log.Fatal("Certificate cannot be created.", err.Error())
@@ -69,11 +70,12 @@ func request() {
 	}
 	// println(string(certPem))
 	// println(string(keyPem))
+
 	certicate, error_cert := tls.X509KeyPair(certPem, keyPem)
 	if error_cert != nil {
 		log.Fatal("Certificate cannot be created.", error_cert.Error())
 	}
-		
+
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -81,10 +83,9 @@ func request() {
 			},
 		},
 	}
+	
 
-	// ConfigureClinet(client)
-
-	req, err := http.NewRequest("GET", "https://www.aw-lab.com/on/demandware.store/Sites-awlab-it-Site/it_IT/Product-GetAvailability?format=ajax&pid=AW_22121RBA_8041591", nil)
+	req, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
@@ -93,18 +94,12 @@ func request() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// browser.CloudflareBypass(resp)
 	
 	// fmt.Println(req)
 	// log.Println("client: connected to: ", resp.Proto, " server in ", time.Since(start))
 	fmt.Printf("<|%v|> [%s]\n", resp.Status, time.Since(start))
 	
 }
-
-
-
-// func ConfigureClinet(client *http.Client, target string, agent string) {
-// 	cfclient.Initialize(client)
 
 
 func set_headers(req *http.Request) {
@@ -121,7 +116,10 @@ func set_headers(req *http.Request) {
 	req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
 	// req.Header.Set("user-agent", uarand.GetRandom())
 	req.Header.Set("x-requested-with", "XMLHttpRequest")
+	req.Header.Set("accept", "*/*")
+	req.Header.Set("accept-encoding", "gzip, deflate, br")
 
+    
 }
 
 
