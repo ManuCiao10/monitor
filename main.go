@@ -86,6 +86,8 @@ func request() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	browser := resp.Header.Get("Server")
+	fmt.Println(browser)
 	// fmt.Println(req)
 	// log.Println("client: connected to: ", resp.Proto, " server in ", time.Since(start))
 	fmt.Printf("<|%v|> [%s]\n", resp.Status, time.Since(start))
@@ -107,20 +109,6 @@ func set_headers(req *http.Request) {
 	// req.Header.Set("user-agent", uarand.GetRandom())
 	req.Header.Set("x-requested-with", "XMLHttpRequest")
 
-
-	// req.Header.Set("accept-language", "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6,fr;q=0.5")
-	// req.Header.Set("cache-control", "no-cache")
-	// req.Header.Set("content-type", "application/json")
-	// req.Header.Set("cookie", "cf_clearance=36XFYDOYVgV14_hS4tIVtVcsG8BztB8e2C5YnRKimio-1662175445-0-150")
-	// req.Header.Set("origin", "https://nowsecure.nl")
-	// req.Header.Set("pragma", "no-cache")
-	// req.Header.Set("sec-ch-ua", `"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"`)
-	// req.Header.Set("sec-ch-ua-mobile", "?0")
-	// req.Header.Set("sec-ch-ua-platform", `"macOS"`)
-	// req.Header.Set("sec-fetch-dest", "empty")
-	// req.Header.Set("sec-fetch-mode", "cors")
-	// req.Header.Set("sec-fetch-site", "same-origin")
-	// req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
 }
 
 
