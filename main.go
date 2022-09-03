@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/pem"
 	"fmt"
+
 	// "io/ioutil"
 	"math/big"
 	"net/http"
@@ -43,8 +44,8 @@ func request() {
 		// you have to generate a different serial number each execution
 		SerialNumber: big.NewInt(123123),
 		Subject: pkix.Name{
-			CommonName:   "New Name",
-			Organization: []string{"New Org."},
+			CommonName:   "Awlab",
+			Organization: []string{"AwlabCF."},
 		},
 		BasicConstraintsValid: true,
 	}
@@ -60,13 +61,13 @@ func request() {
 	if certPem == nil {
 		log.Fatal("Certificate cannot be created.")
 	}
-	// Create a tls certificate from the pem blocks
+	// println(string(certPem))
+	// println(string(keyPem))
 	certicate, error_cert := tls.X509KeyPair(certPem, keyPem)
 	if error_cert != nil {
 		log.Fatal("Certificate cannot be created.", error_cert.Error())
 	}
-	// Create a tls.Config with the certificate
-	
+		
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -75,10 +76,21 @@ func request() {
 		},
 	}
 	// Create a request
-	req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
+	req, err := http.NewRequest("GET", "https://www.awlab.com", nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
+	set_headers(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// log.Println("client: connected to: ", resp.Proto, " server in ", time.Since(start))
+	fmt.Printf("<|%v|> [%s]\n", resp.Status, time.Since(start))
+	
+}
+
+func set_headers(req *http.Request) {
 	req.Header.Set("authority", "en.aw-lab.com")
 	req.Header.Set("accept", "application/json, text/javascript, */*; q=0.01")
 	req.Header.Set("accept-language", "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6,fr;q=0.5")
@@ -91,21 +103,32 @@ func request() {
 	req.Header.Set("sec-fetch-dest", "empty")
 	req.Header.Set("sec-fetch-mode", "cors")
 	req.Header.Set("sec-fetch-site", "same-origin")
-	req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
+	req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36")
 	req.Header.Set("x-requested-with", "XMLHttpRequest")
-	
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Request",req)
-	fmt.Println("Response status:", resp.Status)
-	log.Printf("Time taken: %s", time.Since(start))
-	
-	
 }
+
 
 func main() {
 	request()
 
 }
+
+// log.Fatal(s.ListenAndServeTLS("", ""))
+	// client := &http.Client{}
+	// req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	
+	// resp, err := client.Do(req)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer resp.Body.Close()
+	// bodyText, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("%s\n", bodyText)
+	// log.Println("Request took:", time.Since(start))
+	// log.Println("Status_code:", resp.StatusCode)
