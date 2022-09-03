@@ -16,6 +16,8 @@ import (
 	"crypto/x509/pkix"
 	"log"
 	"time"
+
+	"github.com/corpix/uarand"
 	// http "github.com/saucesteals/fhttp"
 	// "github.com/saucesteals/mimic"
 )
@@ -76,7 +78,7 @@ func request() {
 		},
 	}
 	// Create a request
-	req, err := http.NewRequest("GET", "https://www.awlab.com", nil)
+	req, err := http.NewRequest("GET", "https://www.aw-lab.com/on/demandware.store/Sites-awlab-it-Site/it_IT/Product-GetAvailability?format=ajax&pid=AW_22121RBA_8041591", nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
@@ -85,6 +87,7 @@ func request() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// fmt.Println(req)
 	// log.Println("client: connected to: ", resp.Proto, " server in ", time.Since(start))
 	fmt.Printf("<|%v|> [%s]\n", resp.Status, time.Since(start))
 	
@@ -97,13 +100,10 @@ func set_headers(req *http.Request) {
 	req.Header.Set("cache-control", "no-cache")
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("pragma", "no-cache")
-	req.Header.Set("sec-ch-ua", `"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"`)
-	req.Header.Set("sec-ch-ua-mobile", "?0")
-	req.Header.Set("sec-ch-ua-platform", `"macOS"`)
 	req.Header.Set("sec-fetch-dest", "empty")
 	req.Header.Set("sec-fetch-mode", "cors")
 	req.Header.Set("sec-fetch-site", "same-origin")
-	req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36")
+	req.Header.Set("user-agent", uarand.GetRandom())
 	req.Header.Set("x-requested-with", "XMLHttpRequest")
 }
 
@@ -112,23 +112,3 @@ func main() {
 	request()
 
 }
-
-// log.Fatal(s.ListenAndServeTLS("", ""))
-	// client := &http.Client{}
-	// req, err := http.NewRequest("GET", "https://en.aw-lab.com/on/demandware.store/Sites-awlab-en-Site/en_GB/Product-GetAvailability?format=ajax&pid=AW_106COOCOOA_8012225", nil)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	
-	// resp, err := client.Do(req)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer resp.Body.Close()
-	// bodyText, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%s\n", bodyText)
-	// log.Println("Request took:", time.Since(start))
-	// log.Println("Status_code:", resp.StatusCode)
