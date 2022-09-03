@@ -112,3 +112,10 @@ func main() {
 	request()
 
 }
+
+
+/*
+--- TESTING CF_BYPASS ---
+https://nowsecure.nl/
+
+*/
