@@ -16,6 +16,7 @@ import (
 	"crypto/x509/pkix"
 	"log"
 	"time"
+	"constant"
 	// "github.com/chromedp/cdproto/network"
 	// "github.com/chromedp/chromedp"
 	// "gitlab-com/gl-security/threatmanagement/redteam/redteam-public/cfClearance/browser"
@@ -32,7 +33,7 @@ import (
 
 func request() {
 	start := time.Now()
-	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	key, err := rsa.GenerateKey(rand.Reader, constant.keyBits)
 	if err != nil {
 		log.Fatal("Private key cannot be created.", err.Error())
 	}
@@ -80,7 +81,9 @@ func request() {
 			},
 		},
 	}
-	// Create a request
+
+	// ConfigureClinet(client)
+
 	req, err := http.NewRequest("GET", "https://www.aw-lab.com/on/demandware.store/Sites-awlab-it-Site/it_IT/Product-GetAvailability?format=ajax&pid=AW_22121RBA_8041591", nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
@@ -98,57 +101,11 @@ func request() {
 	
 }
 
-// func CloudflareCookies(resp *http.Response) {
-// 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-// 		// Ignore certificate errors (for use with proxy testing)
-// 		chromedp.Flag("ignore-certificate-errors", "1"),
-// 		// User-Agent MUST match what your tooling uses
-// 		chromedp.UserAgent(agent),
-// 	)
-// 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-// 	defer cancel()
-
-// 	// Create the chrome instance
-// 	ctx, cancel := chromedp.NewContext(
-// 		allocCtx,
-// 		chromedp.WithLogf(log.Printf),
-// 	)
-// 	defer cancel()
-
-// 	// Challenges should be solved in ~5 seconds but can be slower. Timeout at 30.
-// 	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
-// 	defer cancel()
-
-// 	// Listen for the Cloudflare cookie
-// 	cookieReceiverChan := make(chan string, 1)
-// 	defer close(cookieReceiverChan)
-
-// 	// Fetch the login page and wait until CF challenge is solved.
-// 	err := chromedp.Run(ctx,
-// 		chromedp.Navigate(target),
-// 		chromedp.WaitNotPresent(`Checking your browser`, chromedp.BySearch),
-// 		extractCookie(cookieReceiverChan),
-// 	)
-// 	if err != nil {
-// 		if err == context.DeadlineExceeded {
-// 			return errors.New("Context deadline exceeded trying to grab cookie using chromedp")
-// 		}
-// 		return err
-// 	}
-
-// 	// block the program until the cloud flare cookie is received, or .WaitVisible times out looking for login-pane
-// 	cfToken := <-cookieReceiverChan
-
-// 	log.Printf("[*] Grabbed Cloudflare token: %s", cfToken)
-
-// 	// Finally, build up the cookie jar with the required token
-// 	cookieURL, cookies := cfclient.BakeCookies(target, cfToken)
-// 	client.Jar.SetCookies(cookieURL, cookies)
-
-// 	return nil
 
 
-	
+// func ConfigureClinet(client *http.Client, target string, agent string) {
+// 	cfclient.Initialize(client)
+
 
 func set_headers(req *http.Request) {
 	req.Header.Set("authority", "en.aw-lab.com")
