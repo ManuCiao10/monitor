@@ -3,6 +3,7 @@ package browser
 import (
 	"Monitor/cfclient"
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -68,6 +69,7 @@ func extractCookie(c chan string) chromedp.Action {
 			return err
 		}
 		for _, cookie := range cookies {
+			fmt.Printf("COOKIE: %#v\n", cookie.Name)
 			if strings.Contains(cookie.Name, "__cf_bm") {
 				c <- cookie.Value
 			} else {
