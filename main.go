@@ -96,7 +96,7 @@ func ConfigureClient(client *http.Client, target string, agent string) error {
 	// Initialize the client with the things we need to bypass cloudflare
 	cfclient.Initialize(client)
 
-	log.Println("[!] Target is protected by Cloudflare, bypassing...")
+	log.Println("[!] |< Target is protected by Cloudflare, bypassing...|>")
 
 	return browser.GetCloudFlareClearanceCookie(client, agent, target)
 
