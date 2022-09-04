@@ -2,7 +2,6 @@
 
 1. Uses chromedp only for initial cookie acquisition
 2. Inizialize the request with cookies
-3. Fix Import pakcage and CONST
 4. Fix import fucntion from another package/file
 4. Add random working headers
 5. check if the certificate is good with the request

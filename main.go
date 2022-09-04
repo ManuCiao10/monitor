@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/pem"
 	"fmt"
-	"os"
 
 	// "io/ioutil"
 	"crypto/rand"
+	"Monitor/constant"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
@@ -14,20 +14,15 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-	"net/http/cookiejar"
-	"net/url"
 	"time"
+	"github.com/chromedp/chromedp"
 )
 
 // var Sessions = make(map[string]models.Session)
 // var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 // var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
 
-const (
-	// The number of bits to use in the generated private key.
-	AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
-	URL = "https://www.aw-lab.com/on/demandware.store/Sites-awlab-it-Site/it_IT/Product-GetAvailability?format=ajax&pid=AW_22121RBA_8041591"
-)
+
 
 
 func request() {
@@ -85,7 +80,7 @@ func request() {
 	}
 	
 
-	req, err := http.NewRequest("GET", URL, nil)
+	req, err := http.NewRequest("GET", constant.URL, nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
@@ -113,7 +108,7 @@ func set_headers(req *http.Request) {
 	req.Header.Set("sec-fetch-dest", "empty")
 	req.Header.Set("sec-fetch-mode", "cors")
 	req.Header.Set("sec-fetch-site", "same-origin")
-	req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
+	req.Header.Set("user-agent", constant.AGENT)
 	// req.Header.Set("user-agent", uarand.GetRandom())
 	req.Header.Set("x-requested-with", "XMLHttpRequest")
 	req.Header.Set("accept", "*/*")
