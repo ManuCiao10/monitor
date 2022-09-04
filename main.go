@@ -2,11 +2,9 @@ package main
 
 import (
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"Monitor/cfclient"
 	"Monitor/constant"
-	"Monitor/validate"
 	"Monitor/browser"
 	"crypto/rand"
 	"crypto/rsa"
@@ -97,18 +95,6 @@ func request() {
 func ConfigureClient(client *http.Client, target string, agent string) error {
 	// Initialize the client with the things we need to bypass cloudflare
 	cfclient.Initialize(client)
-
-	// Validate the target URL
-	if validate.Url(target) == false {
-		return errors.New("could not parse the target URL")
-	}
-
-	// Check if target is even protected by Cloudflare. If not, just return the
-	// client as-is.
-	if validate.CloudFlareIsPresent(target, client) == false {
-		log.Println("[*] Target not protected by Cloudflare.")
-		return nil
-	}
 
 	log.Println("[!] Target is protected by Cloudflare, bypassing...")
 
