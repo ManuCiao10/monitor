@@ -1,14 +1,15 @@
 package browser
 
 import (
-	"context"
-	"github.com/chromedp/cdproto/network"
-	"github.com/chromedp/chromedp"
 	"Monitor/cfclient"
+	"context"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
 )
 
 func GetCloudFlareClearanceCookie(client *http.Client, agent string, target string) error {
@@ -67,16 +68,11 @@ func extractCookie(c chan string) chromedp.Action {
 			return err
 		}
 		for _, cookie := range cookies {
-			if strings.ToLower(cookie.Name) == "cf_clearance" {
-				println(strings.ToLower(cookie.Name))
-				// if we find a proper cookie, put the value on the receiving channel
+			if strings.Contains(cookie.Name, "__cf_bm") {
 				c <- cookie.Value
-				println("cookie.Value")
 			} else {
 				println("cookies not found")
 			}
-			
-
 		}
 		return nil
 	})
