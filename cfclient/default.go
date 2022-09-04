@@ -1,4 +1,4 @@
-package cfclient_request
+package cfclient
 
 import (
 	"crypto/tls"
