@@ -83,12 +83,14 @@ func request() {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
 	set_headers(req)
+	fmt.Print(req.Header)
+
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
 	
-	// fmt.Println(req)
+	fmt.Println(req)
 	// log.Println("client: connected to: ", resp.Proto, " server in ", time.Since(start))
 	fmt.Printf("<|%v|> [%s]\n", resp.Status, time.Since(start))
 	
