@@ -1,17 +1,13 @@
 package main
 
 import (
-	"context"
 	"encoding/pem"
 	"errors"
-	"strings"
-
-	// "errors"
 	"fmt"
-
-	// "io/ioutil"
-	"Monitor/constant"
 	"Monitor/cfclient"
+	"Monitor/constant"
+	"Monitor/validate"
+	"Monitor/browser"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
@@ -20,18 +16,12 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-	"net/url"
 	"time"
-
-	"github.com/chromedp/cdproto/network"
-	"github.com/chromedp/chromedp"
 )
 
 // var Sessions = make(map[string]models.Session)
 // var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 // var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
-
-
 
 
 func request() {
@@ -75,9 +65,9 @@ func request() {
 	// println(string(certPem))
 	// println(string(keyPem))
 
-	certicate, error_cert := tls.X509KeyPair(certPem, keyPem)
-	if error_cert != nil {
-		log.Fatal("Certificate cannot be created.", error_cert.Error())
+	certicate, err := tls.X509KeyPair(certPem, keyPem)
+	if err != nil {
+		log.Fatal("Certificate cannot be created.", err.Error())
 	}
 
 	client := &http.Client{
@@ -87,7 +77,7 @@ func request() {
 			},
 		},
 	}
-
+	ConfigureClient(client, constant.URL, constant.AGENT)
 	req, err := http.NewRequest("GET", constant.URL, nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
@@ -104,56 +94,28 @@ func request() {
 	
 }
 
-func GetCloudFlareClearanceCookie(client *http.Client) error {
-	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		// Ignore certificate errors (for use with proxy testing)
-		chromedp.Flag("ignore-certificate-errors", "1"),
-		// User-Agent MUST match what your tooling uses
-		chromedp.UserAgent(constant.AGENT),
-	)
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-	defer cancel()
+func ConfigureClient(client *http.Client, target string, agent string) error {
+	// Initialize the client with the things we need to bypass cloudflare
+	cfclient.Initialize(client)
 
-	// Create the chrome instance
-	ctx, cancel := chromedp.NewContext(
-		allocCtx,
-		chromedp.WithLogf(log.Printf),
-	)
-	defer cancel()
-
-	// Challenges should be solved in ~5 seconds but can be slower. Timeout at 30.
-	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-
-	// Listen for the Cloudflare cookie
-	cookieReceiverChan := make(chan string, 1)
-	defer close(cookieReceiverChan)
-
-	// Fetch the login page and wait until CF challenge is solved.
-	err := chromedp.Run(ctx,
-		chromedp.Navigate(constant.URL,),
-		chromedp.WaitNotPresent(`Checking your browser`, chromedp.BySearch),
-		extractCookie(cookieReceiverChan),
-	)
-	if err != nil {
-		if err == context.DeadlineExceeded {
-			return errors.New("Context deadline exceeded trying to grab cookie using chromedp")
-		}
-		return err
+	// Validate the target URL
+	if validate.Url(target) == false {
+		return errors.New("could not parse the target URL")
 	}
 
-	// block the program until the cloud flare cookie is received, or .WaitVisible times out looking for login-pane
-	cfToken := <-cookieReceiverChan
+	// Check if target is even protected by Cloudflare. If not, just return the
+	// client as-is.
+	if validate.CloudFlareIsPresent(target, client) == false {
+		log.Println("[*] Target not protected by Cloudflare.")
+		return nil
+	}
 
-	log.Printf("[*] Grabbed Cloudflare token: %s", cfToken)
+	log.Println("[!] Target is protected by Cloudflare, bypassing...")
 
-	// Finally, build up the cookie jar with the required token
-	cookieURL, cookies := cfclient.BakeCookies(constant.URL, cfToken)
-	client.Jar.SetCookies(cookieURL, cookies)
-
-	return nil
+	return browser.GetCloudFlareClearanceCookie(client, agent, target)
 
 }
+
 
 
 func set_headers(req *http.Request) {
@@ -174,22 +136,6 @@ func set_headers(req *http.Request) {
 	req.Header.Set("accept-encoding", "gzip, deflate, br")
 
     
-}
-
-func extractCookie(c chan string) chromedp.Action {
-	return chromedp.ActionFunc(func(ctx context.Context) error {
-		cookies, err := network.GetAllCookies().Do(ctx)
-		if err != nil {
-			return err
-		}
-		for _, cookie := range cookies {
-			if strings.ToLower(cookie.Name) == "cf_clearance" {
-				// if we find a proper cookie, put the value on the receiving channel
-				c <- cookie.Value
-			}
-		}
-		return nil
-	})
 }
 
 
