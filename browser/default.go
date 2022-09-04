@@ -44,24 +44,19 @@ func GetCloudFlareClearanceCookie(client *http.Client, agent string, target stri
 		extractCookie(cookieReceiverChan),
 	)
 
-	
-	println("3")
 	if err != nil {
 		return err
 	}
-	println("4")
 	// block the program until the cloud flare cookie is received, or .WaitVisible times out looking for login-pane
 
 	cfToken := <-cookieReceiverChan
-	
-	println("5")
+
 	log.Printf("[*] Grabbed Cloudflare token: %s", cfToken)
 
 	// Finally, build up the cookie jar with the required token
 	
 	cookieURL, cookies := cfclient.BakeCookies(target, cfToken)
 	client.Jar.SetCookies(cookieURL, cookies)
-	println("4")
 	return nil
 }
 
@@ -73,10 +68,17 @@ func extractCookie(c chan string) chromedp.Action {
 		}
 		for _, cookie := range cookies {
 			if strings.ToLower(cookie.Name) == "cf_clearance" {
+				println(strings.ToLower(cookie.Name))
 				// if we find a proper cookie, put the value on the receiving channel
 				c <- cookie.Value
+				println("cookie.Value")
+			} else {
+				println("cookies not found")
 			}
+			
+
 		}
 		return nil
 	})
 }
+
