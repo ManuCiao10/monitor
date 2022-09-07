@@ -1,6 +1,7 @@
 ### Add
 
 1. Add Transport and do test
+2. Try and see Chrome Request GO
 2. Uses chromedp only for initial cookie acquisition ✔️
 3. Inizialize the request with cookies ✔️
 4. Fix import fucntion from another package/file ✔️
@@ -10,3 +11,4 @@
 8. check the cookies assigned to the user
 9. hawk api
 10. bypass RapidSSL
+11. Add Antonioli
