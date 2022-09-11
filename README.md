@@ -1,6 +1,7 @@
 ### Add
 
 1. Add Transport and do test
+2. Add Cookies JAR
 2. Try and see Chrome Request GO
 2. Uses chromedp only for initial cookie acquisition ✔️
 3. Inizialize the request with cookies ✔️

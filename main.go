@@ -16,14 +16,16 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/corpix/uarand"
+
 )
 
 // var Sessions = make(map[string]models.Session)
 // var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 // var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
 
-func payload() {
+
+
+func request() {
 	start := time.Now()
 	
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -43,8 +45,8 @@ func payload() {
 		// you have to generate a different serial number each execution
 		SerialNumber: big.NewInt(123123),
 		Subject: pkix.Name{
-			CommonName:   "Awlab",
-			Organization: []string{"AwlabCF."},
+			CommonName:   "AW LAB",
+			Organization: []string{"Awlab"},
 		},
 		BasicConstraintsValid: true,
 	}
@@ -76,17 +78,12 @@ func payload() {
 			},
 		},
 	}
-	
-}
-
-func request() {
-	
 	ConfigureClient(client, constant.URL, constant.AGENT)
 	req, err := http.NewRequest("GET", constant.URL, nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
-	set_headers(req)
+	// set_headers(req)
 	fmt.Print(req.Header)
 
 	resp, err := client.Do(req)
@@ -111,22 +108,22 @@ func ConfigureClient(client *http.Client, target string, agent string) error {
 }
 
 
-func set_headers(req *http.Request) {
-	req.Header.Set("authority", "en.aw-lab.com")
-	req.Header.Set("accept", "application/json, text/javascript, */*; q=0.01")
-	req.Header.Set("accept-language", "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6,fr;q=0.5")
-	req.Header.Set("cache-control", "no-cache")
-	req.Header.Set("content-type", "application/json")
-	req.Header.Set("pragma", "no-cache")
-	req.Header.Set("sec-fetch-dest", "empty")
-	req.Header.Set("sec-fetch-mode", "cors")
-	req.Header.Set("sec-fetch-site", "same-origin")
-	req.Header.Set("user-agent", uarand.GetRandom())
-	req.Header.Set("x-requested-with", "XMLHttpRequest")
-	req.Header.Set("accept", "*/*")
-	req.Header.Set("accept-encoding", "gzip, deflate, br")
+// func set_headers(req *http.Request) {
+// 	req.Header.Set("authority", "en.aw-lab.com")
+// 	req.Header.Set("accept", "application/json, text/javascript, */*; q=0.01")
+// 	req.Header.Set("accept-language", "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6,fr;q=0.5")
+// 	req.Header.Set("cache-control", "no-cache")
+// 	req.Header.Set("content-type", "application/json")
+// 	req.Header.Set("pragma", "no-cache")
+// 	req.Header.Set("sec-fetch-dest", "empty")
+// 	req.Header.Set("sec-fetch-mode", "cors")
+// 	req.Header.Set("sec-fetch-site", "same-origin")
+// 	req.Header.Set("user-agent", uarand.GetRandom())
+// 	req.Header.Set("x-requested-with", "XMLHttpRequest")
+// 	req.Header.Set("accept", "*/*")
+// 	req.Header.Set("accept-encoding", "gzip, deflate, br")
 
-}
+// }
 
 
 func main() {
