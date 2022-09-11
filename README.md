@@ -1,7 +1,8 @@
 ### Add
 
-1. Add Transport and do test
+1. Add ReturnResponse Function
 2. Add Cookies JAR
+3. Add Transport Proxy
 2. Try and see Chrome Request GO
 2. Uses chromedp only for initial cookie acquisition ✔️
 3. Inizialize the request with cookies ✔️

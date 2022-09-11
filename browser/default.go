@@ -3,14 +3,16 @@ package browser
 import (
 	"Monitor/cfclient"
 	"context"
-	"fmt"
+	// "fmt"
 	"log"
+
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
+
 )
 
 func GetCloudFlareClearanceCookie(client *http.Client, agent string, target string) error {
@@ -34,11 +36,9 @@ func GetCloudFlareClearanceCookie(client *http.Client, agent string, target stri
 	// Challenges should be solved in ~5 seconds but can be slower. Timeout at 30.
 	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	println("1")
 	// Listen for the Cloudflare cookie
 	cookieReceiverChan := make(chan string, 1)
 	defer close(cookieReceiverChan)
-	println("2")
 	// Fetch the login page and wait until CF challenge is solved.
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(target),
@@ -54,8 +54,6 @@ func GetCloudFlareClearanceCookie(client *http.Client, agent string, target stri
 	cfToken := <-cookieReceiverChan
 
 	log.Printf("[*] Grabbed Cloudflare token: %s", cfToken)
-
-	// Finally, build up the cookie jar with the required token
 	
 	cookieURL, cookies := cfclient.BakeCookies(target, cfToken)
 	client.Jar.SetCookies(cookieURL, cookies)
@@ -69,11 +67,11 @@ func extractCookie(c chan string) chromedp.Action {
 			return err
 		}
 		for _, cookie := range cookies {
-			fmt.Printf("COOKIE: %#v\n", cookie.Name)
+			// log.Printf("COOKIE: %#v\n", cookie.Name)
 			if strings.Contains(cookie.Name, "__cf_bm") {
 				c <- cookie.Value
 			} else {
-				println("cookies not found")
+				println("cookies not found\n")
 			}
 		}
 		return nil

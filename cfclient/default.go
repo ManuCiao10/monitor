@@ -29,8 +29,8 @@ func BakeCookies(target string, cfToken string) (*url.URL, []*http.Cookie) {
 	d := "." + u.Host
 	var cookies []*http.Cookie
 	cfCookie := &http.Cookie{
-		Name:   "cf_clearance",
-		Value:  cfToken,
+		Name:   "__cf_bm",
+		Value:  "at7IifzYlyIMPF.ujK3IWMiZRju8iHSaamOAQ_QWJkk-1662869729-0-AadvLfPLgFLitXsTEMriPOdX3huXpXd+gDpg2Ax6htDOfgMKQ6URp6mVBXkqGFhb09Rm8s7V9dkzZlMyoZxtGM8=",
 		Path:   "/",
 		Domain: d,
 	}

@@ -11,37 +11,34 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/big"
 	"net/http"
 	"time"
-
-
 )
 
 // var Sessions = make(map[string]models.Session)
 // var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 // var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
 
-
-
 func request() {
 	start := time.Now()
-	
+
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		log.Fatal("Private key cannot be created.", err.Error())
 	}
 
-// Generate a pem block with the private key
+	// Generate a pem block with the private key
 	keyPem := pem.EncodeToMemory(&pem.Block{
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(key),
 	})
 	tml := x509.Certificate{
 		// you can add any attr that you need
-		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(5, 0, 0),
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().AddDate(5, 0, 0),
 		// you have to generate a different serial number each execution
 		SerialNumber: big.NewInt(123123),
 		Subject: pkix.Name{
@@ -49,6 +46,9 @@ func request() {
 			Organization: []string{"Awlab"},
 		},
 		BasicConstraintsValid: true,
+		IsCA:                  true,
+		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment | x509.KeyUsageKeyAgreement,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 	}
 	// Generate a certificate
 	cert, err := x509.CreateCertificate(rand.Reader, &tml, &tml, &key.PublicKey, key)
@@ -70,7 +70,6 @@ func request() {
 	if err != nil {
 		log.Fatal("Certificate cannot be created.", err.Error())
 	}
-
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -78,23 +77,27 @@ func request() {
 			},
 		},
 	}
-	ConfigureClient(client, constant.URL, constant.AGENT)
+	// ConfigureClient(client, constant.URL, constant.AGENT)
 	req, err := http.NewRequest("GET", constant.URL, nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
-	// set_headers(req)
-	fmt.Print(req.Header)
+
+	transport, err := createTransport()
 
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-	fmt.Println(req)
-	// log.Println("client: connected to: ", resp.Proto, " server in ", time.Since(start))
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(body))
+
 	fmt.Printf("<|%v|> [%s]\n", resp.Status, time.Since(start))
-	
+
 }
 
 func ConfigureClient(client *http.Client, target string, agent string) error {
@@ -106,7 +109,6 @@ func ConfigureClient(client *http.Client, target string, agent string) error {
 	return browser.GetCloudFlareClearanceCookie(client, agent, target)
 
 }
-
 
 // func set_headers(req *http.Request) {
 // 	req.Header.Set("authority", "en.aw-lab.com")
@@ -125,11 +127,18 @@ func ConfigureClient(client *http.Client, target string, agent string) error {
 
 // }
 
+// fmt.Println(req)
+// fmt.Println(resp)
+// cookieMap := make(map[string]string)
+// for _, cookie := range resp.Cookies() {
+// 	cookieMap[cookie.Name] = cookie.Value
+// }
+// fmt.Println(cookieMap)
+// log.Println("client: connected to: ", resp.Proto, " server in ", time.Since(start))
 
 func main() {
 	request()
 }
-
 
 /*
 --- TESTING CF_BYPASS ---
