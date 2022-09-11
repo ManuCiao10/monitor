@@ -15,7 +15,7 @@ import (
 	"math/big"
 	"net/http"
 	"time"
-	
+
 	"github.com/corpix/uarand"
 )
 
@@ -23,8 +23,7 @@ import (
 // var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 // var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
 
-
-func request() {
+func payload() {
 	start := time.Now()
 	
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -77,6 +76,11 @@ func request() {
 			},
 		},
 	}
+	
+}
+
+func request() {
+	
 	ConfigureClient(client, constant.URL, constant.AGENT)
 	req, err := http.NewRequest("GET", constant.URL, nil)
 	if err != nil {
@@ -105,7 +109,6 @@ func ConfigureClient(client *http.Client, target string, agent string) error {
 	return browser.GetCloudFlareClearanceCookie(client, agent, target)
 
 }
-
 
 
 func set_headers(req *http.Request) {
