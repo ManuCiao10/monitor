@@ -15,75 +15,28 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"net/url"
 	"time"
+
 )
 
-// var Sessions = make(map[string]models.Session)
-// var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
-// var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
+// Language: go
 
 func request() {
 	start := time.Now()
 
-	key, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		log.Fatal("Private key cannot be created.", err.Error())
-	}
-
-	// Generate a pem block with the private key
-	keyPem := pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(key),
-	})
-	tml := x509.Certificate{
-		// you can add any attr that you need
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().AddDate(5, 0, 0),
-		// you have to generate a different serial number each execution
-		SerialNumber: big.NewInt(123123),
-		Subject: pkix.Name{
-			CommonName:   "AW LAB",
-			Organization: []string{"Awlab"},
-		},
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment | x509.KeyUsageKeyAgreement,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-	}
-	// Generate a certificate
-	cert, err := x509.CreateCertificate(rand.Reader, &tml, &tml, &key.PublicKey, key)
-	if err != nil {
-		log.Fatal("Certificate cannot be created.", err.Error())
-	}
-	// Generate a pem block with the certificate
-	certPem := pem.EncodeToMemory(&pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: cert,
-	})
-	if certPem == nil {
-		log.Fatal("Certificate cannot be created.")
-	}
-	// println(string(certPem))
-	// println(string(keyPem))
-
-	certicate, err := tls.X509KeyPair(certPem, keyPem)
-	if err != nil {
-		log.Fatal("Certificate cannot be created.", err.Error())
-	}
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				Certificates: []tls.Certificate{certicate},
-			},
-		},
-	}
+	
 	// ConfigureClient(client, constant.URL, constant.AGENT)
 	req, err := http.NewRequest("GET", constant.URL, nil)
 	if err != nil {
 		log.Fatal("Request cannot be sent.", err.Error())
 	}
 
-	transport, err := createTransport()
+	transport, err := createTransport(constant.PROXY)
+	if err != nil {
+		log.Fatal("Proxy cannot be created.", err.Error())
+	}
+	client.Transport = transport
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -95,9 +48,25 @@ func request() {
 		log.Fatal(err)
 	}
 	fmt.Println(string(body))
-
 	fmt.Printf("<|%v|> [%s]\n", resp.Status, time.Since(start))
 
+}
+
+
+func createTransport(proxy string) (*http.Transport, error) {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	if proxy != "" {
+		proxyURL, err := url.Parse(proxy)
+		if err != nil {
+			return nil, err
+		}
+		transport.Proxy = http.ProxyURL(proxyURL)
+	}
+	return transport, nil
 }
 
 func ConfigureClient(client *http.Client, target string, agent string) error {

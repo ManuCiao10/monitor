@@ -7,7 +7,15 @@ require (
 	github.com/chromedp/chromedp v0.8.5
 )
 
-require golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
+require (
+	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/klauspost/compress v1.15.4 // indirect
+	github.com/saucesteals/fhttp v0.0.0-20220713050157-e3eea48d7785 // indirect
+	github.com/saucesteals/utls v1.1.2-0.20220526033452-2e6d7376b70a // indirect
+	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898 // indirect
+	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
+	golang.org/x/text v0.3.7 // indirect
+)
 
 require (
 	github.com/chromedp/sysutil v1.0.0 // indirect
@@ -18,5 +26,6 @@ require (
 	github.com/gobwas/ws v1.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/saucesteals/mimic v0.0.0-20220714184236-0f4567d7f8ed
 	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
 )
