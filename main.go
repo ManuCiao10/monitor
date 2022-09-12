@@ -3,7 +3,7 @@ package main
 import (
 	"Monitor/constant"
 	"fmt"
-	// "io/ioutil"
+	"io/ioutil"
 	"net/url"
 	"log"
 	"time"
@@ -42,10 +42,10 @@ func request() {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	// body, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	headersMap := make(map[string]string)
 	for key, value := range resp.Header {
 		headersMap[key] = value[0]
@@ -56,7 +56,7 @@ func request() {
 	}
 	fmt.Println("Headers: ", headersMap)
 	fmt.Println("Cookies: ", cookieMap)
-	// fmt.Println(string(body))
+	fmt.Println("IP: ", string(body))
 	fmt.Printf("<|%v|> [%s]\n", resp.StatusCode, time.Since(start))
 
 }
@@ -122,6 +122,7 @@ func main() {
 /*
 --- TESTING CF_BYPASS ---
 https://tls.peet.ws/api/all
+https://www.ipify.org/
 https://nowsecure.nl/
 https://gitlab.com/gitlab-com/gl-security/threatmanagement/redteam/redteam-public/cfClearance
 https://pkg.go.dev/net/http
