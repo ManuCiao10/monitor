@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/klauspost/compress v1.15.4 // indirect
 	github.com/saucesteals/fhttp v0.0.0-20220713050157-e3eea48d7785 // indirect
 	github.com/saucesteals/utls v1.1.2-0.20220526033452-2e6d7376b70a // indirect
@@ -18,6 +19,7 @@ require (
 )
 
 require (
+	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/corpix/uarand v0.2.0 // indirect
 	github.com/go-resty/resty/v2 v2.7.0
