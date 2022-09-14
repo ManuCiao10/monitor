@@ -21,9 +21,14 @@ import (
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"regexp"
+	"strconv"
+
 	// "html"
 	"io/ioutil"
 
+	"github.com/robertkrimen/otto"
 	// "github.com/PuerkitoBio/goquery"
 	// "io/ioutil"
 	// "io/ioutil"
@@ -32,6 +37,29 @@ import (
 // Language: go
 var latestVersion = mimic.MustGetLatestVersion(mimic.PlatformWindows)
 var m, _ = mimic.Chromium(mimic.BrandChrome, latestVersion)
+
+func initClient(proxy string) (*http.Client, error) {
+	transport, err := createTransport(proxy)
+	if err != nil {
+		return nil, err
+	}
+
+	return &http.Client{
+		Transport: m.ConfigureTransport(transport),
+	}, nil
+}
+
+func createTransport(proxy string) (*http.Transport, error) {
+	if len(proxy) != 0 {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			return nil, err
+		}
+		return &http.Transport{Proxy: http.ProxyURL(proxyUrl)}, nil
+	} else {
+		return &http.Transport{}, nil
+	}
+}
 
 func request(cParams *C.char) *C.char {
 	start := time.Now()
@@ -79,7 +107,7 @@ func request(cParams *C.char) *C.char {
 	server_header := resp.Header.Get("Server")
 	if server_header == "cloudflare" && resp.StatusCode == 503 {
 		log.Println("Cloudflare detected")
-		n_resp := Solve_cf_challenge(resp)
+		n_resp := Solve_cf_challenge(resp, client)
 		resp = n_resp
 
 	}
@@ -96,7 +124,10 @@ func request(cParams *C.char) *C.char {
 	return C.CString("Finished")
 }
 
-func Solve_cf_challenge(resp *http.Response) *http.Response {
+var jschlRegexp = regexp.MustCompile(`name="jschl_vc" value="(\w+)"`)
+var passRegexp = regexp.MustCompile(`name="pass" value="(.+?)"`)
+
+func Solve_cf_challenge(resp *http.Response, client *http.Client) *http.Response {
 	time.Sleep(time.Second * 4)
 
 	b, err := ioutil.ReadAll(resp.Body)
@@ -106,44 +137,86 @@ func Solve_cf_challenge(resp *http.Response) *http.Response {
 	}
 	resp.Body = ioutil.NopCloser(bytes.NewReader(b))
 
+	var params = make(url.Values)
+
+	if m := jschlRegexp.FindStringSubmatch(string(b)); len(m) > 0 {
+		params.Set("jschl_vc", m[1])
+	}
+
+	if m := passRegexp.FindStringSubmatch(string(b)); len(m) > 0 {
+		params.Set("pass", m[1])
+	}
+
+	chkURL, _ := url.Parse("/cdn-cgi/l/chk_jschl")
+	u := resp.Request.URL.ResolveReference(chkURL)
+
+	js, err := extractJS(string(b))
+	if err != nil {
+		log.Fatal(err)
+	}
+	answer, err := evaluateJS(js)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	params.Set("jschl_answer", strconv.Itoa(int(answer)+len(resp.Request.URL.Host)))
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s?%s", u.String(), params.Encode()), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req.Header.Set("User-Agent", resp.Request.Header.Get("User-Agent"))
+	req.Header.Set("Referer", resp.Request.URL.String())
+
+	log.Printf("Requesting %s?%s", u.String(), params.Encode())
+	// client := http.Client{
+	// 	Transport: t.upstream,
+	// 	Jar:       t.Cookies,
+	// }
+
+	resp, err = client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return resp
 }
 
+// Language: go
+// Path: go.mod
+var jsRegexp = regexp.MustCompile(
+	`setTimeout\(function\(\){\s+(var ` +
+		`s,t,o,p,b,r,e,a,k,i,n,g,f.+?\r?\n[\s\S]+?a\.value =.+?)\r?\n`,
+)
+var jsReplace1Regexp = regexp.MustCompile(`a\.value = (parseInt\(.+?\)).+`)
+var jsReplace2Regexp = regexp.MustCompile(`\s{3,}[a-z](?: = |\.).+`)
+var jsReplace3Regexp = regexp.MustCompile(`[\n\\']`)
 
-func initClient(proxy string) (*http.Client, error) {
-	transport, err := createTransport(proxy)
+func evaluateJS(js string) (int64, error) {
+	vm := otto.New()
+	result, err := vm.Run(js)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-
-	return &http.Client{
-		Transport: m.ConfigureTransport(transport),
-	}, nil
+	return result.ToInteger()
 }
 
-func createTransport(proxy string) (*http.Transport, error) {
-	if len(proxy) != 0 {
-		proxyUrl, err := url.Parse(proxy)
-		if err != nil {
-			return nil, err
-		}
-		return &http.Transport{Proxy: http.ProxyURL(proxyUrl)}, nil
-	} else {
-		return &http.Transport{}, nil
+func extractJS(body string) (string, error) {
+	matches := jsRegexp.FindStringSubmatch(body)
+	if len(matches) == 0 {
+		return "", errors.New("No matching javascript found")
 	}
+
+	js := matches[1]
+	js = jsReplace1Regexp.ReplaceAllString(js, "$1")
+	js = jsReplace2Regexp.ReplaceAllString(js, "")
+
+	// Strip characters that could be used to exit the string context
+	// These characters are not currently used in Cloudflare's arithmetic snippet
+	js = jsReplace3Regexp.ReplaceAllString(js, "")
+
+	return js, nil
 }
-
-// func ConfigureClient(client *http.Client, target string, agent string) error {
-// 	// Initialize the client with the things we need to bypass cloudflare
-// 	cfclient.Initialize(client)
-
-// 	log.Println("[!] |< Target is protected by Cloudflare, bypassing...|>")
-
-// 	return browser.GetCloudFlareClearanceCookie(client, agent, target)
-
-// }
-
-// }
 
 func main() {
 	seshJson := `{"session":"","requestType":"GET","parameters":{"url":"https://www.facebook.com/","proxy":"http://127.0.0.1:8888","headers":{"user-agent":"Go-http-client/2.0","accept-encoding":""},"FORM":null,"JSON":"","cookies":null,"redirects":true},"proxy":""}`
