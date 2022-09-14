@@ -120,6 +120,7 @@ func request(cParams *C.char) *C.char {
 	}
 	fmt.Printf("<|%v|> [%s]\n", resp.StatusCode, time.Since(start))
 	// fmt.Printf("<|%v|> \n", resp.Cookies())
+	fmt.Println(resp)
 
 	return C.CString("Finished")
 }
@@ -150,6 +151,7 @@ func Solve_cf_challenge(resp *http.Response, client *http.Client) *http.Response
 	chkURL, _ := url.Parse("/cdn-cgi/l/chk_jschl")
 	u := resp.Request.URL.ResolveReference(chkURL)
 
+	fmt.Println("Solving challenge for", string(b))
 	js, err := extractJS(string(b))
 	if err != nil {
 		log.Fatal(err)
