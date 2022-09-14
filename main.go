@@ -14,12 +14,18 @@ import (
 
 	// "github.com/corpix/uarand"
 
-	"github.com/PuerkitoBio/goquery"
+	// "github.com/PuerkitoBio/goquery"
 	http "github.com/saucesteals/fhttp"
 	"github.com/saucesteals/mimic"
 )
 import (
+	"bytes"
 	"encoding/json"
+	// "html"
+	"io/ioutil"
+
+	// "github.com/PuerkitoBio/goquery"
+	// "io/ioutil"
 	// "io/ioutil"
 )
 
@@ -70,34 +76,39 @@ func request(cParams *C.char) *C.char {
 	if err != nil {
 		log.Fatal(err)
 	}
+	server_header := resp.Header.Get("Server")
+	if server_header == "cloudflare" && resp.StatusCode == 503 {
+		log.Println("Cloudflare detected")
+		n_resp := Solve_cf_challenge(resp)
+		resp = n_resp
+
+	}
+
 	defer resp.Body.Close()
 
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(doc.Find("title").Text())
-
-	// headersMap := make(map[string]string)
-	// for key, value := range resp.Header {
-	// 	headersMap[key] = value[0]
-	// }
 	cookieMap := make(map[string]string)
 	for _, cookie := range resp.Cookies() {
 		cookieMap[cookie.Name] = cookie.Value
 	}
-
-	// fmt.Println("Cookies_req: ", cookieReq)
-	// fmt.Println("Headers: ", headersMap)
-	// fmt.Println("Cookies: ", cookieMap)
-	// fmt.Println(string(body))
-
 	fmt.Printf("<|%v|> [%s]\n", resp.StatusCode, time.Since(start))
-	fmt.Printf("<|%v|> \n", resp.Cookies())
+	// fmt.Printf("<|%v|> \n", resp.Cookies())
 
 	return C.CString("Finished")
-
 }
+
+func Solve_cf_challenge(resp *http.Response) *http.Response {
+	time.Sleep(time.Second * 4)
+
+	b, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	resp.Body = ioutil.NopCloser(bytes.NewReader(b))
+
+	return resp
+}
+
 
 func initClient(proxy string) (*http.Client, error) {
 	transport, err := createTransport(proxy)
