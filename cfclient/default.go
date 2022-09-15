@@ -30,7 +30,7 @@ func BakeCookies(target string, cfToken string) (*url.URL, []*http.Cookie) {
 	var cookies []*http.Cookie
 	cfCookie := &http.Cookie{
 		Name:   "__cf_bm",
-		Value:  "at7IifzYlyIMPF.ujK3IWMiZRju8iHSaamOAQ_QWJkk-1662869729-0-AadvLfPLgFLitXsTEMriPOdX3huXpXd+gDpg2Ax6htDOfgMKQ6URp6mVBXkqGFhb09Rm8s7V9dkzZlMyoZxtGM8=",
+		Value:  cfToken,
 		Path:   "/",
 		Domain: d,
 	}
@@ -39,3 +39,4 @@ func BakeCookies(target string, cfToken string) (*url.URL, []*http.Cookie) {
 
 	return cookieURL, cookies
 }
+

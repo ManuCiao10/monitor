@@ -3,6 +3,8 @@ package browser
 import (
 	"Monitor/cfclient"
 	"context"
+	"fmt"
+
 	// "fmt"
 	"log"
 
@@ -12,7 +14,6 @@ import (
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
-
 )
 
 func GetCloudFlareClearanceCookie(client *http.Client, agent string, target string) error {
@@ -35,6 +36,7 @@ func GetCloudFlareClearanceCookie(client *http.Client, agent string, target stri
 
 	// Challenges should be solved in ~5 seconds but can be slower. Timeout at 30.
 	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
+	println("Waiting for Cloudflare challenge to be solved...")
 	defer cancel()
 	// Listen for the Cloudflare cookie
 	cookieReceiverChan := make(chan string, 1)
@@ -50,11 +52,12 @@ func GetCloudFlareClearanceCookie(client *http.Client, agent string, target stri
 		return err
 	}
 	// block the program until the cloud flare cookie is received, or .WaitVisible times out looking for login-pane
+	fmt.Printf("Waiting for cookie...\n")
 
 	cfToken := <-cookieReceiverChan
 
 	log.Printf("[*] Grabbed Cloudflare token: %s", cfToken)
-	
+
 	cookieURL, cookies := cfclient.BakeCookies(target, cfToken)
 	client.Jar.SetCookies(cookieURL, cookies)
 	return nil
@@ -67,11 +70,11 @@ func extractCookie(c chan string) chromedp.Action {
 			return err
 		}
 		for _, cookie := range cookies {
-			// log.Printf("COOKIE: %#v\n", cookie.Name)
-			if strings.Contains(cookie.Name, "__cf_bm") {
+			fmt.Printf("Found : %s\n", cookie.Name)
+			fmt.Printf("Value cookie: %s\n", cookie.Value)
+			if strings.ToLower(cookie.Name) == "__cf_bm" {
+				// if we find a proper cookie, put the value on the receiving channel
 				c <- cookie.Value
-			} else {
-				println("cookies not found\n")
 			}
 		}
 		return nil
