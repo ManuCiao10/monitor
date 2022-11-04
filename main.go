@@ -1,10 +1,9 @@
 package main
 
 import (
-	"Monitor/browser"
-	"Monitor/cfclient"
+	"github.com/ManuCiao10/monitor/browser"
+	"github.com/ManuCiao10/monitor/cfclient"
 
-	// "Monitor/constant"
 	"fmt"
 
 	"errors"
