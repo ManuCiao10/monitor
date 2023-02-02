@@ -1,0 +1,4 @@
+# WeTheNew Monitor
+
+docker build -t cosignement .
+docker run -it --rm --name <app_name> cosignement

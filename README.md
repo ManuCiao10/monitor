@@ -1,5 +1,7 @@
-### Monitor
+### Monitor for the following sites:
 
--Awlab Monitor | bypass cloud_flare \n
--Wethenew | Consign product Monitor
+-Awlab bypass cloud_flare Monitor
+-Wethenew consignment Monitor
+-Wethenew released Monitor
 -Dover Street Market Monitor
+-BuzzSneaker Monitor
