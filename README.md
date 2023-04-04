@@ -26,15 +26,6 @@ Clone the repository to your local machine.
 Build the Docker image by running docker build -t sneaker-monitor .
 Run the Docker container by running docker run -d sneaker-monitor
 
-### Configuration
-The Sneaker Monitor can be configured by editing the config.py file. The following settings are available:
-
-DISCORD_WEBHOOK_URL: The Discord webhook URL to send notifications to.
-DISCORD_WEBHOOK_AVATAR_URL: The Discord webhook avatar URL to use for notifications.
-DISCORD_WEBHOOK_USERNAME: The Discord webhook username to use for notifications.
-DISCORD_WEBHOOK_EMBED_COLOR: The Discord webhook embed color to use for notifications.
-DISCORD_WEBHOOK_EMBED_IMAGE: The Discord webhook embed image to use for notifications.
-
 ### Contributing
 If you would like to contribute to the Sneaker Monitor, please follow these steps:
 
