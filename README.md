@@ -1,12 +1,8 @@
-##Monitor for the following sites:
+## Monitor for the following sites:
 
-
-Awlab bypass cloud_flare Monitor
-Wethenew consignment Monitor
-Wethenew released Monitor
-Dover Street Market Monitor
-Oqium Monitor
-JD Sports Monitor
-
-
-
+1. Awlab bypass cloud_flare Monitor
+2. Wethenew consignment Monitor
+3. Wethenew released Monitor
+4. Dover Street Market Monitor
+5. Oqium Monitor
+6. JD Sports Monitor
