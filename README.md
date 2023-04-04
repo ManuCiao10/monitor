@@ -1,5 +1,5 @@
 ### Sneaker Monitor
-The Sneaker Monitor is a Python-based tool designed to monitor sneaker stores' endpoint APIs and scrape new products, then send notifications via Discord webhook whenever a new limited product has been loaded or restocked.
+Monitoring sneakers store endpoint API to scrape new products and sends a discord webhook whenever a new limited product has been loaded or restocked.
 
 ### Supported Sites
 The following sneaker stores are currently supported by the Sneaker Monitor:
