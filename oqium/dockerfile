@@ -1,0 +1,22 @@
+FROM python:3.11
+
+
+#Labels as key value pair
+LABEL Maintainer="@manuciao"
+
+
+#to COPY the remote file at working directory in container
+COPY main.py .
+COPY oqium/backendlink.py .
+COPY oqium/start.py .
+COPY oqium/typesOqium.py .
+COPY requirements.txt .
+COPY oqium/* oqium/
+
+
+#to install the required packages requirements.txt
+RUN pip install -r requirements.txt
+
+
+
+CMD ["python", "./main.py"]

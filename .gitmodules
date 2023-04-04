@@ -1,0 +1,3 @@
+[submodule "JD-monitor"]
+	path = JD-monitor
+	url = https://github.com/ManuCiao10/JD-monitor
