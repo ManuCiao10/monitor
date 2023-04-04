@@ -4,12 +4,12 @@ The Sneaker Monitor is a Python-based tool designed to monitor sneaker stores' e
 ### Supported Sites
 The following sneaker stores are currently supported by the Sneaker Monitor:
 
-Awlab (bypassing Cloudflare protection)
-Wethenew (consignment)
-Wethenew (released)
-Dover Street Market
-Oqium
-JD Sports
+1. Awlab (bypassing Cloudflare protection) 
+2. Wethenew (consignment)
+3. Wethenew (released)
+4. Dover Street Market
+5. Oqium
+6. JD Sports
 
 ### Installation and Setup
 To use the Sneaker Monitor, follow these steps:
@@ -33,14 +33,7 @@ DISCORD_WEBHOOK_URL: The Discord webhook URL to send notifications to.
 DISCORD_WEBHOOK_AVATAR_URL: The Discord webhook avatar URL to use for notifications.
 DISCORD_WEBHOOK_USERNAME: The Discord webhook username to use for notifications.
 DISCORD_WEBHOOK_EMBED_COLOR: The Discord webhook embed color to use for notifications.
-DISCORD_WEBHOOK_EMBED_FOOTER: The Discord webhook embed footer to use for notifications.
-DISCORD_WEBHOOK_EMBED_THUMBNAIL: The Discord webhook embed thumbnail to use for notifications.
 DISCORD_WEBHOOK_EMBED_IMAGE: The Discord webhook embed image to use for notifications.
-DISCORD_WEBHOOK_EMBED_AUTHOR_NAME: The Discord webhook embed author name to use for notifications.
-DISCORD_WEBHOOK_EMBED_AUTHOR_URL: The Discord webhook embed author URL to use for notifications.
-DISCORD_WEBHOOK_EMBED_AUTHOR_ICON_URL: The Discord webhook embed author icon URL to use for notifications.
-DISCORD_WEBHOOK_EMBED_TITLE: The Discord webhook embed title to use for notifications.
-DISCORD_WEBHOOK_EMBED_URL: The Discord webhook embed URL to use for notifications.
 
 ### Contributing
 If you would like to contribute to the Sneaker Monitor, please follow these steps:
