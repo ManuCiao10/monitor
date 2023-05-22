@@ -14,9 +14,9 @@ The following sneaker stores are currently supported by the Sneaker Monitor:
 ### Installation and Setup
 To use the Sneaker Monitor, follow these steps:
 
-Clone the repository to your local machine.
-Install the required dependencies by running pip install -r requirements.txt in the project directory.
-Configure the config.py file with your desired settings.
+Clone the repository to your local machine.\
+Install the required dependencies by running pip install -r requirements.txt in the project directory.\
+Configure the config.py file with your desired settings.\
 Run the main.py file.
 
 ### Docker
