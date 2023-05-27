@@ -10,6 +10,10 @@ The following sneaker stores are currently supported by the Sneaker Monitor:
 4. Dover Street Market
 5. Oqium
 6. JD Sports
+7. Nike
+8. Nike-Restock
+9. Vans
+10. Ticket-Master
 
 ### Installation and Setup
 To use the Sneaker Monitor, follow these steps:
