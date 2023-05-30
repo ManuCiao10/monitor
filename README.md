@@ -20,7 +20,8 @@ To use the Sneaker Monitor, follow these steps:
 
 Clone the repository to your local machine.\
 Install the required dependencies by running pip install -r requirements.txt in the project directory.\
-Configure the config.py file with your desired settings.\
+Configure the config.py file with your desired settings.(When required)\
+Otherwise, you can run the main.py file with the default settings.(Filling up the webhook url directly in the file)\
 Run the main.py file.
 
 ### Docker
